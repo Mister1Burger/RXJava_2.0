@@ -3,6 +3,8 @@ package home.rxjavatest;
 import android.app.DatePickerDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -60,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         MyTask task = new MyTask();
         task.execute("doInBackground");
 
+ //       new Handler(Looper.getMainLooper()). postAtTime(() -> {},1000);
+
+ //       https://xakep.ru/2016/06/01/android-multithreading-1/
 
 //        TestClass testClass = new TestClass();
 //
