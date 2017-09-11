@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 //    EditText tv2;
 //    @BindView(R2.id.tv_3)
 //    EditText tv3;
+    @BindView(R2.id.text_for_number)
+    TextView textView;
 
     @BindView(R2.id.fab)
     FloatingActionButton fab;
@@ -62,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
         MyTask task = new MyTask();
         task.execute("doInBackground");
 
- //       new Handler(Looper.getMainLooper()). postAtTime(() -> {},1000);
+        //       new Handler(Looper.getMainLooper()). postAtTime(() -> {},1000);
 
- //       https://xakep.ru/2016/06/01/android-multithreading-1/
+        //       https://xakep.ru/2016/06/01/android-multithreading-1/
 
 //        TestClass testClass = new TestClass();
 //
@@ -90,17 +93,18 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             mySpinner.getSpinner().show();
-            Log.d("TAG","begin");
+            Log.d("TAG", "begin");
         }
 
         @Override
         protected String doInBackground(String... params) {
-            try {
-                TimeUnit.SECONDS.sleep(2);
-                Log.d("TAG",params[0]);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+            TestClass testClass = new TestClass();
+            testClass.getNumbers()
+                    .flatMap(integerStringMap -> Observable.fromIterable(integerStringMap.keySet()))
+                    .filter(integer -> integer > 2);
+            textView.setText(testClass.getNumbers());
+
             return "end";
         }
 
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.content_main, new StartPresentationFragment())
                     .commit();
-            Log.d("TAG","End");
+            Log.d("TAG", "End");
         }
     }
 

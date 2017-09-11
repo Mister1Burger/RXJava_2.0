@@ -1,8 +1,12 @@
 package home.rxjavatest;
 
 
+import android.util.ArrayMap;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 import io.reactivex.Observable;
@@ -11,14 +15,18 @@ import io.reactivex.ObservableSource;
 public class TestClass {
 
 
-    public Observable<List<Gun>> getGuns() {
+    public Observable<Map<Integer,String>> getNumbers()  {
 
-        List<Gun> gunList = new ArrayList<>();
+        Map<Integer, String> numberList = new TreeMap<>();
 
-        return Observable.just(gunList)
-                .doOnNext(guns -> guns.add(new Gun("4,5mm", 256)))
-                .doOnNext(guns -> guns.add(new Gun("5,5mm", 156)))
-                .doOnNext(guns -> guns.add(new Gun("6,35mm", 56)));
+        return Observable.just(numberList)
+                .doOnNext(numbers -> numbers.put(0,"null"))
+                .doOnNext(numbers -> numbers.put(5,"five"))
+                .doOnNext(numbers -> numbers.put(3,"three"))
+                .doOnNext(numbers -> numbers.put(2,"two"))
+                .doOnNext(numbers -> numbers.put(4,"four"))
+                .doOnNext(numbers -> numbers.put(1,"one"));
+
     }
 
 
