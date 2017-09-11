@@ -1,6 +1,7 @@
 package home.rxjavatest;
 
 import android.app.DatePickerDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -10,11 +11,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,12 +29,14 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R2.id.tv_1)
-    EditText tv1;
-    @BindView(R2.id.tv_2)
-    EditText tv2;
-    @BindView(R2.id.tv_3)
-    EditText tv3;
+
+    MySpinner mySpinner;
+//    @BindView(R2.id.tv_1)
+//    EditText tv1;
+//    @BindView(R2.id.tv_2)
+//    EditText tv2;
+//    @BindView(R2.id.tv_3)
+//    EditText tv3;
 
     @BindView(R2.id.fab)
     FloatingActionButton fab;
@@ -48,48 +53,88 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        TestClass testClass = new TestClass();
+        fab.setVisibility(View.GONE);
 
-        testClass.getGuns()
-                .subscribeOn(Schedulers.io())
-//                .map(this::sortConversation)
-                .flatMap(Observable::fromIterable)
-                .filter(gun -> gun.getSpeedBullet() < 200)
-                .toList()
-                .toObservable()
-                .doOnNext(guns -> Log.d("TAG", String.valueOf(guns.size())))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(guns -> {
-                }, throwable -> {
-                });
+        mySpinner = new MySpinner(this);
+
+        MyTask task = new MyTask();
+        task.execute("doInBackground");
+
+
+//        TestClass testClass = new TestClass();
+//
+//        testClass.getGuns()
+//                .subscribeOn(Schedulers.io())
+////                .map(this::sortConversation)
+//                .flatMap(Observable::fromIterable)
+//                .filter(gun -> gun.getSpeedBullet() < 200)
+//                .toList()
+//                .toObservable()
+//                .doOnNext(guns -> Log.d("TAG", String.valueOf(guns.size())))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(guns -> {
+//                }, throwable -> {
+//                });
 
         fab.setOnClickListener(view -> showDialog());
+    }
+
+    class MyTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mySpinner.getSpinner().show();
+            Log.d("TAG","begin");
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+                Log.d("TAG",params[0]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "end";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            mySpinner.getSpinner().dismiss();
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.content_main, new StartPresentationFragment())
+                    .commit();
+            Log.d("TAG","End");
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        disposables.add(Observable.combineLatest(
-                RxViewEvents
-                        .getTextChangeObservable(tv1)
-                        .map(value -> !TextUtils.isEmpty(value))
-//                        .doOnNext(this::checkAndSetError)
-                ,
-                RxViewEvents
-                        .getTextChangeObservable(tv2)
-                        .map(value -> !TextUtils.isEmpty(value))
-//                        .doOnNext(value -> checkAndSetError(value, errorLanguages, txtLanguagesText))
-                ,
-                RxViewEvents
-                        .getTextChangeObservable(tv3)
-                        .map(value -> value.matches("\\+\\d{4}"))
-//                        .doOnNext(value -> checkAndSetError(value, errorPhone, txtPhoneText))
-                ,
-                (f1, f2, f3) -> f1 && f2 && f3)
-                        .subscribeOn(AndroidSchedulers.mainThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::setSaveButtonVisible)
-        );
+//        disposables.add(Observable.combineLatest(
+//                RxViewEvents
+//                        .getTextChangeObservable(tv1)
+//                        .map(value -> !TextUtils.isEmpty(value))
+////                        .doOnNext(this::checkAndSetError)
+//                ,
+//                RxViewEvents
+//                        .getTextChangeObservable(tv2)
+//                        .map(value -> !TextUtils.isEmpty(value))
+////                        .doOnNext(value -> checkAndSetError(value, errorLanguages, txtLanguagesText))
+//                ,
+//                RxViewEvents
+//                        .getTextChangeObservable(tv3)
+//                        .map(value -> value.matches("\\+\\d{4}"))
+////                        .doOnNext(value -> checkAndSetError(value, errorPhone, txtPhoneText))
+//                ,
+//                (f1, f2, f3) -> f1 && f2 && f3)
+//                        .subscribeOn(AndroidSchedulers.mainThread())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(this::setSaveButtonVisible)
+//        );
     }
 
     private void setSaveButtonVisible(boolean flag) {
